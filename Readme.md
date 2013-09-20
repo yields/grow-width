@@ -11,7 +11,9 @@
 
 ## API
 
+### grow(el)
 
+Grow the input as the user types.
 
 ## License
 
