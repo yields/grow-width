@@ -9,6 +9,15 @@
 
     $ component install yields/grow-width
 
+## Example
+
+```js
+var destroy = grow(input);
+
+// to destroy / unbind
+destroy();
+```
+
 ## API
 
 ### grow(el)
