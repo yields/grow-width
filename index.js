@@ -3,34 +3,73 @@
  * dependencies
  */
 
-var measure = require('measure-string')
-  , event = require('event');
+var event = require('event');
 
 /**
  * Grow the width of the given `el`.
  *
  * @param {Element} el
+ * @return {Function}
  * @api public
  */
 
 exports = module.exports = function(el){
-  var prev;
+  var span = document.createElement('span')
+    , styl = window.getComputedStyle(el)
+    , prev;
+
+  // measure
+  span.style.letterSpacing = styl.letterSpacing;
+  span.style.textTransform = styl.textTransform;
+  span.style.position = 'absolute';
+  span.style.whiteSpace = 'nowrap';
+  span.style.top = -1000 + 'px';
+  span.style.font = styl.font;
+  span.style.width = 'auto';
+  span.style.padding = 0;
+
+  // events
+  event.bind(el, 'keyup', retreat);
+  event.bind(el, 'keypress', grow);
+  event.bind(el, 'focus', append);
+  event.bind(el, 'blur', remove);
+
+  // append
+  function append(){
+    document.body.appendChild(span);
+  }
+
+  // remove
+  function remove(){
+    if (!span.parentNode) return;
+    document.body.removeChild(span);
+  }
 
   // grow
-  event.bind(el, 'keypress', function(e){
+  function grow(e){
     var c = String.fromCharCode(e.keyCode);
-    var w = measure(el, el.value + c)
+    span.textContent = el.value + c;
+    var w = span.clientWidth;
     if (prev == w) return;
     el.style.width = w + 'px';
     prev = w;
-  });
+  }
 
   // retreat
-  event.bind(el, 'keyup', function(e){
+  function retreat(e){
     if (8 != e.which) return;
-    var w = measure(el, el.value);
+    span.textContent = el.value;
+    var w = span.clientWidth;
     if (prev == w) return;
     el.style.width = w + 'px';
     prev = w;
-  });
+  }
+
+  // destroy
+  return function(){
+    event.unbind(el, 'keyup', retreat);
+    event.unbind(el, 'keypress', grow);
+    event.unbind(el, 'focus', append);
+    event.unbind(el, 'blur', remove);
+  };
 };

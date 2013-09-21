@@ -8,7 +8,6 @@
   "main": "index.js",
   "scripts": ["index.js"],
   "dependencies": {
-    "yields/measure-string": "*",
     "component/event": "*"
   }
 }
