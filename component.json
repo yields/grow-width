@@ -2,7 +2,7 @@
   "name": "grow-width",
   "repo": "yields/grow-width",
   "description": "Grow the width of the given input.",
-  "version": "0.0.2",
+  "version": "0.1.1",
   "keywords": ["grow"],
   "license": "MIT",
   "main": "index.js",
