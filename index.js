@@ -28,6 +28,13 @@ exports = module.exports = function(el){
   span.style.width = 'auto';
   span.style.padding = 0;
 
+  // min / max
+  var min = parseFloat(styl.minWidth, 10) || 4;
+  var max = parseFloat(styl.maxWidth, 10);
+
+  // resize to min
+  el.style.width = min + 'px';
+
   // events
   event.bind(el, 'keyup', retreat);
   event.bind(el, 'keypress', grow);
@@ -48,18 +55,22 @@ exports = module.exports = function(el){
   // grow
   function grow(e){
     var c = String.fromCharCode(e.keyCode);
-    span.textContent = el.value + c;
-    var w = span.clientWidth;
-    if (prev == w) return;
-    el.style.width = w + 'px';
-    prev = w;
+    if (e.shiftKey) c = c.toUpperCase();
+    resize(el.value + c);
   }
 
   // retreat
   function retreat(e){
     if (8 != e.which) return;
-    span.textContent = el.value;
+    resize(el.value);
+  }
+
+  // resize
+  function resize(val){
+    span.textContent = val;
     var w = span.clientWidth;
+    if (max < w) w = max;
+    if (min > w) w = min;
     if (prev == w) return;
     el.style.width = w + 'px';
     prev = w;
