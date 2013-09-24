@@ -12,17 +12,22 @@
 ## Example
 
 ```js
-var destroy = grow(input);
-
-// to destroy / unbind
-destroy();
+grow(input);
 ```
 
 ## API
 
-### grow(el)
+### Grow(el)
 
-Grow the input as the user types.
+  Grow the input as the user types.
+
+### update([str])
+
+  Update the input size with `str` or the input own value.
+
+### destroy()
+
+  Unbind internal events and remove the shadow element.
 
 ## License
 

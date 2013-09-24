@@ -3,84 +3,143 @@
  * dependencies
  */
 
-var event = require('event');
+var events = require('events');
 
 /**
- * Grow the width of the given `el`.
+ * Export `Grow`
+ */
+
+module.exports = Grow;
+
+/**
+ * Initialize `Grow` with `input`.
  *
- * @param {Element} el
- * @return {Function}
+ * @param {Element} input
  * @api public
  */
 
-exports = module.exports = function(el){
-  var span = document.createElement('span')
-    , styl = window.getComputedStyle(el)
-    , prev;
+function Grow(input){
+  if (!(this instanceof Grow)) return new Grow(input);
+  this.events = events(input, this);
+  this.el = input;
+  this.shadow();
+  this.bind();
+}
 
-  // measure
-  span.style.letterSpacing = styl.letterSpacing;
-  span.style.textTransform = styl.textTransform;
-  span.style.position = 'absolute';
-  span.style.whiteSpace = 'nowrap';
-  span.style.top = -1000 + 'px';
-  span.style.font = styl.font;
-  span.style.width = 'auto';
-  span.style.padding = 0;
+/**
+ * Bind internal events.
+ *
+ * @return {Grow}
+ * @api public
+ */
 
-  // min / max
-  var min = parseFloat(styl.minWidth, 10) || 4;
-  var max = parseFloat(styl.maxWidth, 10);
+Grow.prototype.bind = function(){
+  this.events.bind('blur', 'remove');
+  this.events.bind('focus', 'add');
+  this.events.bind('keypress');
+  this.events.bind('keyup');
+  return this;
+};
 
-  // resize to min
-  el.style.width = min + 'px';
+/**
+ * Destroy.
+ *
+ * @return {Grow}
+ * @api public
+ */
 
-  // events
-  event.bind(el, 'keyup', retreat);
-  event.bind(el, 'keypress', grow);
-  event.bind(el, 'focus', append);
-  event.bind(el, 'blur', remove);
+Grow.prototype.destroy = function(){
+  this.events.unbind();
+  this.remove();
+  return this;
+};
 
-  // append
-  function append(){
-    document.body.appendChild(span);
-  }
+/**
+ * Create the shadow element.
+ *
+ * @return {Grow}
+ * @api public
+ */
 
-  // remove
-  function remove(){
-    if (!span.parentNode) return;
-    document.body.removeChild(span);
-  }
+Grow.prototype.shadow = function(){
+  var el = this.shadow = document.createElement('span');
+  var styl = window.getComputedStyle(this.el);
+  this.min = parseFloat(styl.minWidth, 10) || 4;
+  this.max = parseFloat(styl.maxWidth, 10);
+  el.style.letterSpacing = styl.letterSpacing;
+  el.style.textTransform = styl.textTransform;
+  el.style.position = 'absolute';
+  el.style.top = -1000 + 'px';
+  el.style.font = styl.font;
+  el.style.width = 'auto';
+  el.style.padding = 0;
+  return this;
+};
 
-  // grow
-  function grow(e){
-    var c = String.fromCharCode(e.keyCode);
-    if (e.shiftKey) c = c.toUpperCase();
-    resize(el.value + c);
-  }
+/**
+ * Update to `str` or `el.value`.
+ *
+ * @param {String} str
+ * @return {Grow}
+ * @api public
+ */
 
-  // retreat
-  function retreat(e){
-    if (8 != e.which) return;
-    resize(el.value);
-  }
+Grow.prototype.update = function(str){
+  this.shadow.textContent = str || this.el.value;
+  var w = this.shadow.clientWidth;
+  if (this.max < w) w = this.max;
+  if (this.min > w) w = this.min;
+  if (this.prev == w) return this;
+  this.el.style.width = w + 'px';
+  this.prev = w;
+  return this;
+};
 
-  // resize
-  function resize(val){
-    span.textContent = val;
-    var w = span.clientWidth;
-    if (max < w) w = max;
-    if (min > w) w = min;
-    if (prev == w) return;
-    el.style.width = w + 'px';
-    prev = w;
-  }
+/**
+ * Add the shadow.
+ *
+ * @param {Event} e
+ * @api private
+ */
 
-  // destroy
-  return function(){
-    event.unbind(el, 'keyup', retreat);
-    event.unbind(el, 'keypress', grow);
-    event.unbind(el, 'focus', append);
-    event.unbind(el, 'blur', remove);
-  };
+Grow.prototype.add = function(){
+  if (this.shadow.parentNode) return;
+  document.body.appendChild(this.shadow);
+};
+
+/**
+ * Remove the shadow.
+ *
+ * @param {Event} e
+ * @api private
+ */
+
+Grow.prototype.remove = function(){
+  if (!this.shadow.parentNode) return;
+  document.body.removeChild(this.shadow);
+};
+
+/**
+ * on-keypress.
+ *
+ * @param {Event} e
+ * @api private
+ */
+
+Grow.prototype.onkeypress = function(e){
+  var c = String.fromCharCode(e.keyCode);
+  if (e.shiftKey) c = c.toUpperCase();
+  this.update(e.target.value + c);
+};
+
+/**
+ * on-keyup.
+ *
+ * @param {Event} e
+ * @api public
+ */
+
+Grow.prototype.onkeyup = function(e){
+  if (8 != e.which) return;
+  this.update();
 };
