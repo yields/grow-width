@@ -20,9 +20,12 @@ module.exports = Grow;
 
 function Grow(input){
   if (!(this instanceof Grow)) return new Grow(input);
+  this.label = input.placeholder || '';
+  input.placeholder = '';
   this.events = events(input, this);
   this.el = input;
   this.shadow();
+  this.update();
   this.bind();
 }
 
@@ -50,6 +53,22 @@ Grow.prototype.bind = function(){
 
 Grow.prototype.destroy = function(){
   this.events.unbind();
+  this.remove();
+  return this;
+};
+
+/**
+ * Set the input width to the placeholder width.
+ *
+ * @return {Grow}
+ * @api public
+ */
+
+Grow.prototype.placeholder = function(){
+  if ('' == this.label) return this;
+  this.add();
+  this.el.placeholder = this.label;
+  this.update(this.label);
   this.remove();
   return this;
 };
@@ -104,6 +123,7 @@ Grow.prototype.update = function(str){
 
 Grow.prototype.add = function(){
   if (this.shadow.parentNode) return;
+  this.el.placeholder = '';
   document.body.appendChild(this.shadow);
 };
 

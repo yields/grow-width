@@ -18,11 +18,11 @@
   </style>
 </head>
 <body>
-  <input type='text'>
+  <input type='text' placeholder='placeholder...'>
   <script src='build/build.js'></script>
   <script>
     var grow = require('grow-width');
-    grow(document.body.children[0]);
+    grow(document.body.children[0]).placeholder();
   </script>
 </body>
 </html>
