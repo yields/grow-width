@@ -104,7 +104,8 @@ Grow.prototype.shadow = function(){
  */
 
 Grow.prototype.update = function(str){
-  this.shadow.textContent = str || this.el.value;
+  str = str || this.el.value;
+  this.shadow.textContent = str.replace(/ /g, '\xA0'); // non breaking space
   var w = this.shadow.clientWidth;
   if (this.max < w) w = this.max;
   if (this.min > w) w = this.min;
