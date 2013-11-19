@@ -22,7 +22,6 @@ function Grow(input){
   if (!(this instanceof Grow)) return new Grow(input);
   this.label = input.placeholder || '';
   input.placeholder = '';
-  this.initial = window.getComputedStyle(input).width;
   this.events = events(input, this);
   this.el = input;
   this.shadow();
