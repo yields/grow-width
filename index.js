@@ -22,6 +22,7 @@ function Grow(input){
   if (!(this instanceof Grow)) return new Grow(input);
   this.label = input.placeholder || '';
   input.placeholder = '';
+  this.initial = window.getComputedStyle(input).width;
   this.events = events(input, this);
   this.el = input;
   this.shadow();
@@ -37,7 +38,7 @@ function Grow(input){
  */
 
 Grow.prototype.bind = function(){
-  this.events.bind('blur', 'remove');
+  this.events.bind('blur');
   this.events.bind('focus', 'add');
   this.events.bind('keypress');
   this.events.bind('keyup');
@@ -137,6 +138,18 @@ Grow.prototype.add = function(){
 Grow.prototype.remove = function(){
   if (!this.shadow.parentNode) return;
   document.body.removeChild(this.shadow);
+};
+
+/**
+ * on-blur.
+ *
+ * @api private
+ */
+
+Grow.prototype.onblur = function(){
+  this.el.placeholder = this.label;
+  if (!this.el.value) this.placeholder();
+  this.remove();
 };
 
 /**
