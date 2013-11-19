@@ -1,4 +1,9 @@
 
+0.2.2 / 2013-11-19
+==================
+
+ * include leading and trailing spaces in width calculation [juliangruber]
+
 0.2.1 / 2013-09-28
 ==================
 
